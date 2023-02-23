@@ -6,7 +6,6 @@ from typing import AsyncGenerator
 from starlette.testclient import TestClient
 from httpx import AsyncClient
 
-#import your app
 from app.main import app
 
 
