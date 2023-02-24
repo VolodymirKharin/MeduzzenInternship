@@ -1,16 +1,39 @@
-version: "3.7"
-services:
+version: "3.9"
 
-  app:
-    container_name: "app"
-    image: app
-    build:
-      context: .
-      dockerfile: Dockerfile
+services:
+  web:
+    build: .
+    container_name: app
+    command: python -m app.main
+    volumes:
+      - .:/app
     ports:
-      - "8000:8000"
+      - ${PORT}:${PORT}
     env_file:
       - .env
-#    command: bash -c "uvicorn main:app"
-#    networks:
-#      - custom
+    depends_on:
+      - db
+      - redis
+
+  db:
+    image: postgres:14-alpine
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    ports:
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+    env_file:
+      - .env
+
+  redis:
+    image: redis:latest
+    ports:
+      - ${REDIS_PORT}:${REDIS_PORT}
+
+volumes:
+  postgres_data:
+  redis_data:

@@ -1,8 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
-from app import config
-
+import app.config as config
+import aioredis
+from app.utils.db_connection import get_db
 
 app = FastAPI()
 
@@ -17,6 +18,18 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"]
 )
+
+
+@app.on_event('startup')
+async def startup_event():
+    app.state.redis_pool = aioredis.ConnectionPool.from_url(config.REDIS_URL)
+    await get_db().connect()
+
+@app.get('/redis')
+async def read_redis():
+    redis = aioredis.Redis(connection_pool=app.state.redis_pool)
+    value = await redis.get('mykey')
+    return {'key': 'mykey', 'value': value}
 @app.get('/')
 def home():
     return {"status_code": 200, "detail": "ok", "result": "working"}
