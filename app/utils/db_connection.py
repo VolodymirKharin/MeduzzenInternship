@@ -6,6 +6,10 @@ from config import DATABASE_URL, REDIS_URL
 database = databases.Database(DATABASE_URL)
 
 
+async def get_db():
+    return database
+
+
 async def connect_to_database():
     await database.connect()
 
