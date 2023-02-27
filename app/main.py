@@ -1,26 +1,41 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from routers.handlers import router
 import uvicorn
-from app import config
+import config
+from utils.db_connection import connect_to_database, close_database_connection, get_redis
 
 
-app = FastAPI()
+def get_application() -> FastAPI:
 
-origins = [
-    "https://0.0.0.0:8000"
-]
+    my_app = FastAPI()
+    my_app.include_router(router)
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"]
-)
-@app.get('/')
-def home():
-    return {"status_code": 200, "detail": "ok", "result": "working"}
+    origins = [
+        "https://0.0.0.0:8000"
+    ]
 
+    my_app.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"]
+    )
+
+    @my_app.on_event("startup")
+    async def startup():
+        get_redis()
+        await connect_to_database()
+
+    @my_app.on_event("shutdown")
+    async def shutdown():
+        await close_database_connection()
+
+    return my_app
+
+
+app = get_application()
 
 if __name__ == '__main__':
     uvicorn.run('main:app', host=config.HOST, port=config.PORT, reload=True)
