@@ -16,3 +16,7 @@ d-run:
 d-stop:
 	docker stop
 
+a-m:
+	alembic revision --autogenerate -m "m1"
+a-h:
+	alembic upgrade head

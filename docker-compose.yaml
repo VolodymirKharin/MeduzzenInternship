@@ -19,19 +19,34 @@ services:
     restart: always
     volumes:
       - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - .env
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
     ports:
       - ${POSTGRES_PORT}:${POSTGRES_PORT}
-    env_file:
-      - .env
 
   redis:
     image: redis:latest
     ports:
       - ${REDIS_PORT}:${REDIS_PORT}
+
+  pgadmin:
+    container_name: pgadmin_container
+    image: dpage/pgadmin4
+    restart: always
+    env_file:
+      - .env
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+
 
 volumes:
   postgres_data:
