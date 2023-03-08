@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from routers.handlers import router
 import uvicorn
 import config
-from utils.db_connection import connect_to_database, close_database_connection, get_redis
+from db.db_connection import connect_to_database, close_database_connection, get_redis
 
 
 def get_application() -> FastAPI:

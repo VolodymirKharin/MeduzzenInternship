@@ -1,38 +1,42 @@
-from typing import List
-
-from pydantic import BaseModel, EmailStr, constr
+from pydantic import BaseModel, Field, EmailStr,  constr
 from datetime import datetime
 
 
-class User(BaseModel):
+class UserScheme(BaseModel):
     user_id: int
-    created_at: datetime
     user_name: str
     user_email: EmailStr
     user_status: bool
-
-    class Config:
-        orm_mode = True
+    created_at: datetime = Field(default_factory=datetime.now())#.strftime("%Y-%m-%d %H:%M:%S")
+    updated_at: datetime = Field(default_factory=datetime.now())#.strftime("%Y-%m-%d %H:%M:%S")
 
 
 class SignInRequest(BaseModel):
     user_email: EmailStr
-    user_password: constr(min_lenght=7, max_length=100)
+    user_password: str
 
 
 class SignUpRequest(BaseModel):
     user_name: str
     user_email: EmailStr
-    user_password: constr(min_lenght=7, max_length=100)
-    user_rep_password: constr(min_lenght=7, max_length=100)
+    user_password: str
+    user_rep_password: str
+    user_status: bool
+
+
+class InsertDB(BaseModel):
+    user_name: str
+    user_email: EmailStr
+    user_password: str
+    user_status: bool
 
 
 class UserUpdateRequest(BaseModel):
     user_name: str
     user_status: bool
-    user_password: constr(min_lenght=7, max_length=100)
-    user_rep_password: constr(min_lenght=7, max_length=100)
+    user_password: str
+    user_rep_password: str
 
 
 class UserListResponse(BaseModel):
-    Users: List[User]
+    users: list[UserScheme]
