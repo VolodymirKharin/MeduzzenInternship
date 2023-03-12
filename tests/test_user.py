@@ -57,9 +57,10 @@ async def test_create_user_one(ac: AsyncClient):
       "user_password_repeat": "testt",
       "user_email": "test1@test.com",
       "user_name": "test1",
+      "user_status": True,
     }
     response = await ac.post("/user", json=payload)
-    assert response.status_code == 200
+    assert response.status_code == 201
     assert response.json().get("result").get("user_id") == 1
 
 
@@ -69,6 +70,7 @@ async def test_create_user_error(ac: AsyncClient):
       "user_password_repeat": "testt",
       "user_email": "test1@test.com",
       "user_name": "test2",
+      "user_status": True,
     }
     response = await ac.post("/user", json=payload)
     assert response.status_code == 400
@@ -80,9 +82,10 @@ async def test_create_user_two(ac: AsyncClient):
       "user_password_repeat": "testt",
       "user_email": "test2@test.com",
       "user_name": "test2",
+      "user_status": True,
     }
     response = await ac.post("/user", json=payload)
-    assert response.status_code == 200
+    assert response.status_code == 201
     assert response.json().get("result").get("user_id") == 2
 
 
@@ -92,9 +95,10 @@ async def test_create_user_three(ac: AsyncClient):
       "user_password_repeat": "testt",
       "user_email": "test3@test.com",
       "user_name": "test3",
+      "user_status": True,
     }
     response = await ac.post("/user", json=payload)
-    assert response.status_code == 200
+    assert response.status_code == 201
     assert response.json().get("result").get("user_id") == 3
 
 
@@ -144,7 +148,7 @@ async def test_update_user_not_exist(ac: AsyncClient):
 
 async def test_delete_user_one(ac: AsyncClient):
     response = await ac.delete("/user?user_id=1")
-    assert response.status_code == 200
+    assert response.status_code == 204
 
 
 async def test_get_users_list_after_delete(ac: AsyncClient):

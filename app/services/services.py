@@ -1,11 +1,9 @@
-from typing import Optional
-
 from fastapi import HTTPException
 
 from sqlalchemy.sql import select, insert, update, delete
 
 from models.models import User
-from schemas.schemas import UserScheme, UserListResponse, UserUpdateRequest, SignUpRequest, InsertDB
+from schemas.schemas import UserScheme, UserListResponse, UserUpdateRequest, SignUpRequest, Results, ResultUser
 from databases import Database
 
 from utils.security import hash
@@ -15,22 +13,25 @@ class UserServices:
     def __init__(self, db: Database):
         self.db = db
 
-    async def get_users(self) -> UserListResponse:
-        user_list = await self.db.fetch_all(query=select(User))
-        return UserListResponse(users=[UserScheme(**item) for item in user_list])
 
-    async def get_user(self, user_id: int) -> Optional[UserScheme]:
+    async def get_users(self) -> Results:
+        user_list = await self.db.fetch_all(query=select(User))
+        result = UserListResponse(users=[UserScheme(**item) for item in user_list])
+        return Results(result=result)
+
+    async def get_user(self, user_id: int) -> ResultUser:
         query = select(User).where(User.user_id == user_id)
         user = await self.db.fetch_one(query=query)
         if not user:
             raise HTTPException(status_code=404, detail='User does not exist')
-        return UserScheme(**dict(user))
+        return ResultUser(result=UserScheme(**dict(user)))
 
-    async def create_user(self, user: SignUpRequest) -> UserScheme:
+    async def create_user(self, user: SignUpRequest) -> ResultUser:
         new_user = dict(user)
-        if not (new_user["user_password"] == new_user["user_rep_password"]):
-            raise HTTPException(status_code=404, detail='Passwords do not match')
-        new_user.pop("user_rep_password", None)
+        if not (new_user["user_password"] == new_user["user_password_repeat"]):
+            raise HTTPException(status_code=422, detail='Passwords do not match')
+        await self.check_email(user_email=new_user["user_email"])
+        new_user.pop("user_password_repeat", None)
         hashed_password = hash.encrypt_password(password=new_user["user_password"])
         new_user["user_password"] = hashed_password
         query = insert(User).values(new_user)
@@ -48,14 +49,23 @@ class UserServices:
         if not user:
             raise HTTPException(status_code=404, detail='User does not exist')
 
-    async def update_user(self, user_id: int, user: UserUpdateRequest) -> UserScheme:
+    async def check_email(self, user_email: str):
+        query = select(User).where(User.user_email == user_email)
+        user = await self.db.fetch_one(query=query)
+        if user:
+            raise HTTPException(status_code=400, detail='Email already exist')
+
+    async def update_user(self, user_id: int, user: UserUpdateRequest) -> ResultUser:
         await self.check_for_existing(user_id=user_id)
         update_data = dict(user)
-        if not (update_data["user_password"] == update_data["user_rep_password"]):
-            raise HTTPException(status_code=404, detail='Passwords do not match')
-        hashed_password = hash.encrypt_password(password=update_data["user_password"])
-        update_data["user_password"] = hashed_password
-        update_data.pop("user_rep_password", None)
+        if update_data["user_password"] is not None:
+            if not (update_data["user_password"] == update_data["user_password_repeat"]):
+                raise HTTPException(status_code=404, detail='Passwords do not match')
+            hashed_password = hash.encrypt_password(password=update_data["user_password"])
+            update_data["user_password"] = hashed_password
+        else:
+            update_data.pop("user_password", None)
+        update_data.pop("user_password_repeat", None)
         query = update(User).where(User.user_id == user_id).values(update_data)
         await self.db.execute(query=query)
         updated_user = await self.get_user(user_id=user_id)

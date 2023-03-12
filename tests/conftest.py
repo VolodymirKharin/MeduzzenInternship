@@ -3,7 +3,6 @@ import pytest
 
 from typing import AsyncGenerator
 from starlette.testclient import TestClient
-from databases import Database
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.pool import NullPool
 from httpx import AsyncClient
@@ -15,16 +14,16 @@ from models.models import Base
 #import your test urls for db
 from app.config import DATABASE_TEST_URL
 #import your get_db func
-from db.db_connection import get_db
+from db.db_connection import database as test_db
 
-test_db: Database = Database(DATABASE_TEST_URL, force_rollback=True)
-
-
-def override_get_db() -> Database:
-    return test_db
+# test_db: Database = Database(DATABASE_TEST_URL, force_rollback=True)
 
 
-app.dependency_overrides[get_db] = override_get_db
+# def override_get_db() -> Database:
+#     return test_db
+
+
+# app.dependency_overrides[get_db] = override_get_db
 
 
 engine_test = create_async_engine(DATABASE_TEST_URL, poolclass=NullPool)

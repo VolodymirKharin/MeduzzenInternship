@@ -4,6 +4,8 @@ import os
 
 load_dotenv()
 
+ENVIRONMENT = os.getenv("ENVIRONMENT")
+
 HOST = os.getenv("HOST")
 PORT = int(os.getenv("PORT"))
 
