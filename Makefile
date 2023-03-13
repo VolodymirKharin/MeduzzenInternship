@@ -16,7 +16,11 @@ d-run:
 d-stop:
 	docker stop
 
-a-m:
-	alembic revision --autogenerate -m "m1"
+a-ini:
+	alembic init -t async migrations
+a-ct:
+	alembic revision --autogenerate -m "create table"
+a-ct:
+	alembic revision --autogenerate -m "migration_1"
 a-h:
 	alembic upgrade head

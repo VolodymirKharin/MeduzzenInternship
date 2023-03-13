@@ -1,12 +1,13 @@
 import aioredis
 import databases
-from config import DATABASE_URL, REDIS_URL
+from config import DATABASE_URL, REDIS_URL, DATABASE_TEST_URL, ENVIRONMENT
 
+if ENVIRONMENT == "TESTING":
+    database = databases.Database(DATABASE_TEST_URL, force_rollback=True)
+else:
+    database = databases.Database(DATABASE_URL)
 
-database = databases.Database(DATABASE_URL)
-
-
-async def get_db():
+def get_db() -> databases.Database:
     return database
 
 

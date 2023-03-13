@@ -1,18 +1,21 @@
 version: "3.9"
 
 services:
-  web:
-    build: .
-    command: python app/main.py
-    volumes:
-      - .:/app
-    ports:
-      - ${PORT}:${PORT}
-    env_file:
-      - .env
-    depends_on:
-      - db
-      - redis
+#  web:
+#    build: .
+#    command: python app/main.py
+#    volumes:
+#      - .:/app
+#    ports:
+#      - ${PORT}:${PORT}
+#    env_file:
+#      - .env
+#    environment:
+#      - POSTGRES_HOST=db
+#      - REDIS_HOST=redis
+#    depends_on:
+#      - db
+#      - redis
 
   db:
     image: postgres:14-alpine
@@ -28,10 +31,22 @@ services:
     ports:
       - ${POSTGRES_PORT}:${POSTGRES_PORT}
 
-  redis:
-    image: redis:latest
+  test_db:
+    image: postgres:14-alpine
+    restart: always
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${TEST_DB}
     ports:
-      - ${REDIS_PORT}:${REDIS_PORT}
+      - ${TEST_PORT}:${POSTGRES_PORT}
+
+#  redis:
+#    image: redis:latest
+#    ports:
+#      - ${REDIS_PORT}:${REDIS_PORT}
 
   pgadmin:
     container_name: pgadmin_container

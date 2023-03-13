@@ -1,7 +1,10 @@
 from dotenv import load_dotenv
 import os
 
+
 load_dotenv()
+
+ENVIRONMENT = os.getenv("ENVIRONMENT")
 
 HOST = os.getenv("HOST")
 PORT = int(os.getenv("PORT"))
@@ -12,6 +15,10 @@ POSTGRES_DB = os.getenv("POSTGRES_DB")
 POSTGRES_HOST = os.getenv("POSTGRES_HOST")
 POSTGRES_PORT = os.getenv("POSTGRES_PORT")
 
+TEST_DB = os.getenv("TEST_DB")
+TEST_PORT = os.getenv("TEST_PORT")
+
+
 PGADMIN_PORT = os.getenv("PGADMIN_PORT")
 
 REDIS_HOST = os.getenv("REDIS_HOST")
@@ -21,4 +28,5 @@ REDIS_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}"
 
 DATABASE_URL = f"postgresql+asyncpg://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
 
+DATABASE_TEST_URL = f"postgresql+asyncpg://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{TEST_PORT}/{TEST_DB}"
 

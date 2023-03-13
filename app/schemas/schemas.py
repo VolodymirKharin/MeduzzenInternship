@@ -1,15 +1,16 @@
+from typing import Optional
+from pydantic import BaseModel, Field, EmailStr
 from typing import List
-
-from pydantic import BaseModel, EmailStr, constr
 from datetime import datetime
 
 
-class User(BaseModel):
+class UserScheme(BaseModel):
     user_id: int
-    created_at: datetime
     user_name: str
     user_email: EmailStr
     user_status: bool
+    created_at: datetime = Field(default_factory=datetime.now())
+    updated_at: datetime = Field(default_factory=datetime.now())
 
     class Config:
         orm_mode = True
@@ -17,22 +18,49 @@ class User(BaseModel):
 
 class SignInRequest(BaseModel):
     user_email: EmailStr
-    user_password: constr(min_lenght=7, max_length=100)
+    user_password: str = Field(..., min_length=5, max_length=20)
+    user_password_repeat: str = Field(..., min_length=5, max_length=20)
+
+    class Config:
+        orm_mode = True
 
 
 class SignUpRequest(BaseModel):
     user_name: str
     user_email: EmailStr
-    user_password: constr(min_lenght=7, max_length=100)
-    user_rep_password: constr(min_lenght=7, max_length=100)
+    user_password: str = Field(..., min_length=5, max_length=20)
+    user_password_repeat: str = Field(..., min_length=5, max_length=20)
+    user_status: bool
+
+    class Config:
+        orm_mode = True
 
 
 class UserUpdateRequest(BaseModel):
     user_name: str
-    user_status: bool
-    user_password: constr(min_lenght=7, max_length=100)
-    user_rep_password: constr(min_lenght=7, max_length=100)
+    user_password: Optional[str]
+    user_password_repeat: Optional[str]
+
+    class Config:
+        orm_mode = True
 
 
 class UserListResponse(BaseModel):
-    Users: List[User]
+    users: List[UserScheme] = []
+
+    class Config:
+        orm_mode = True
+
+
+class Results(BaseModel):
+    result: Optional[UserListResponse]
+
+    class Config:
+        orm_mode = True
+
+
+class ResultUser(BaseModel):
+    result: Optional[UserScheme]
+
+    class Config:
+        orm_mode = True
