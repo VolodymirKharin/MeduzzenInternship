@@ -7,12 +7,12 @@ from schemas.schemas import UserScheme, UserListResponse, UserUpdateRequest, Sig
 from databases import Database
 
 from utils.security import hash
+from datetime import datetime
 
 
 class UserServices:
     def __init__(self, db: Database):
         self.db = db
-
 
     async def get_users(self) -> Results:
         user_list = await self.db.fetch_all(query=select(User))
@@ -27,13 +27,18 @@ class UserServices:
         return ResultUser(result=UserScheme(**dict(user)))
 
     async def create_user(self, user: SignUpRequest) -> ResultUser:
-        new_user = dict(user)
-        if not (new_user["user_password"] == new_user["user_password_repeat"]):
+        if not (user.user_password == user.user_password_repeat):
             raise HTTPException(status_code=422, detail='Passwords do not match')
-        await self.check_email(user_email=new_user["user_email"])
-        new_user.pop("user_password_repeat", None)
-        hashed_password = hash.encrypt_password(password=new_user["user_password"])
-        new_user["user_password"] = hashed_password
+        await self.check_email(user_email=user.user_email)
+        new_user = {
+            "created_at": datetime.now(),
+            "updated_at": datetime.now(),
+            "user_name": user.user_name,
+            "user_email": user.user_email,
+            "user_password": hash.encrypt_password(password=user.user_password),
+            "user_status": user.user_status,
+
+        }
         query = insert(User).values(new_user)
         user_id = await self.db.execute(query=query)
         new_user_db = await self.get_user(user_id)
@@ -57,15 +62,17 @@ class UserServices:
 
     async def update_user(self, user_id: int, user: UserUpdateRequest) -> ResultUser:
         await self.check_for_existing(user_id=user_id)
-        update_data = dict(user)
-        if update_data["user_password"] is not None:
-            if not (update_data["user_password"] == update_data["user_password_repeat"]):
+        if user.user_password is not None:
+            if not (user.user_password == user.user_password_repeat):
                 raise HTTPException(status_code=404, detail='Passwords do not match')
-            hashed_password = hash.encrypt_password(password=update_data["user_password"])
-            update_data["user_password"] = hashed_password
+            update_data = {
+                "user_name": user.user_name,
+                "user_password": hash.encrypt_password(password=user.user_password),
+            }
         else:
-            update_data.pop("user_password", None)
-        update_data.pop("user_password_repeat", None)
+            update_data = {
+                "user_name": user.user_name,
+            }
         query = update(User).where(User.user_id == user_id).values(update_data)
         await self.db.execute(query=query)
         updated_user = await self.get_user(user_id=user_id)
