@@ -15,11 +15,18 @@ class UserScheme(BaseModel):
     class Config:
         orm_mode = True
 
+class UserSchemeToken(BaseModel):
+    user_id: int
+    user_name: str
+    user_email: EmailStr
+    user_status: bool
 
+    class Config:
+        orm_mode = True
 class SignInRequest(BaseModel):
     user_email: EmailStr
-    user_password: str = Field(..., min_length=5, max_length=20)
-    user_password_repeat: str = Field(..., min_length=5, max_length=20)
+    user_password: str = Field(..., min_length=4, max_length=20)
+
 
     class Config:
         orm_mode = True
@@ -28,8 +35,8 @@ class SignInRequest(BaseModel):
 class SignUpRequest(BaseModel):
     user_name: str
     user_email: EmailStr
-    user_password: str = Field(..., min_length=5, max_length=20)
-    user_password_repeat: str = Field(..., min_length=5, max_length=20)
+    user_password: str = Field(..., min_length=4, max_length=20)
+    user_password_repeat: str = Field(..., min_length=4, max_length=20)
     user_status: bool
 
     class Config:
@@ -59,8 +66,25 @@ class Results(BaseModel):
         orm_mode = True
 
 
+class ResultUserToken(BaseModel):
+    result: Optional[UserSchemeToken]
+
+    class Config:
+        orm_mode = True
+
+
 class ResultUser(BaseModel):
     result: Optional[UserScheme]
 
     class Config:
         orm_mode = True
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
+class TokenResponse(BaseModel):
+    result: Optional[Token]
+

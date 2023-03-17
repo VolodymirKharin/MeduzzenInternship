@@ -27,9 +27,13 @@ class UserServices:
         return ResultUser(result=UserScheme(**dict(user)))
 
     async def create_user(self, user: SignUpRequest) -> ResultUser:
+        print("@@@@@@")
         if not (user.user_password == user.user_password_repeat):
             raise HTTPException(status_code=422, detail='Passwords do not match')
         await self.check_email(user_email=user.user_email)
+        # email_exist = await self.get_user_by_email(user_email=user.user_email)
+        # if email_exist:
+        #     raise HTTPException(status_code=400, detail='Email already exist')
         new_user = {
             "created_at": datetime.now(),
             "updated_at": datetime.now(),
@@ -54,11 +58,23 @@ class UserServices:
         if not user:
             raise HTTPException(status_code=404, detail='User does not exist')
 
-    async def check_email(self, user_email: str):
+    async def get_user_by_email(self, user_email: str) -> UserScheme:
+        query = select(User).where(User.user_email == user_email)
+        user = await self.db.fetch_one(query=query)
+        if not user:
+            return None
+        return ResultUser(result=UserScheme(**dict(user)))
+
+    async def check_email(self, user_email: str) -> ResultUser:
         query = select(User).where(User.user_email == user_email)
         user = await self.db.fetch_one(query=query)
         if user:
-            raise HTTPException(status_code=400, detail='Email already exist')
+            raise HTTPException(status_code=400, detail='email exist')
+
+    async def get_user_password(self, user_email: str) -> str:
+        query = select(User).where(User.user_email == user_email)
+        user = await self.db.fetch_one(query=query)
+        return user.user_password
 
     async def update_user(self, user_id: int, user: UserUpdateRequest) -> ResultUser:
         await self.check_for_existing(user_id=user_id)
@@ -77,5 +93,3 @@ class UserServices:
         await self.db.execute(query=query)
         updated_user = await self.get_user(user_id=user_id)
         return updated_user
-
-
