@@ -1,7 +1,6 @@
 from fastapi import HTTPException
 
 from sqlalchemy.sql import select, insert, update, delete
-
 from models.models import User
 from schemas.schemas import UserScheme, UserListResponse, UserUpdateRequest, SignUpRequest, Results, ResultUser
 from databases import Database
@@ -27,13 +26,9 @@ class UserServices:
         return ResultUser(result=UserScheme(**dict(user)))
 
     async def create_user(self, user: SignUpRequest) -> ResultUser:
-        print("@@@@@@")
         if not (user.user_password == user.user_password_repeat):
             raise HTTPException(status_code=422, detail='Passwords do not match')
         await self.check_email(user_email=user.user_email)
-        # email_exist = await self.get_user_by_email(user_email=user.user_email)
-        # if email_exist:
-        #     raise HTTPException(status_code=400, detail='Email already exist')
         new_user = {
             "created_at": datetime.now(),
             "updated_at": datetime.now(),
