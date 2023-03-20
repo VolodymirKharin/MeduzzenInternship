@@ -30,7 +30,7 @@ async def get_current_user(token: str = Depends(token_auth_scheme), db: Database
         if not new_user:
             new_user = await create_user_from_auth(email_from_auth)
             return new_user
-        return new_user
+        return new_user.result
 
 
 async def create_user_from_auth(email: str) -> ResultUser:
