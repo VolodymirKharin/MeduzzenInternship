@@ -406,3 +406,4 @@ dmypy.json
 
 .env
 
+alembic.ini
