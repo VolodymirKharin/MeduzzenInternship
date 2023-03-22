@@ -32,6 +32,7 @@ class CompanyServices:
         return ResultCompany(result=CompanyScheme(**dict(company)))
 
     async def create_company(self, company: SignUpCompany) -> ResultCompany:
+        await self.check_company_name(company_name=company.company_name)
         datetime_now = datetime.now()
         new_company = {
             "created_at": datetime_now,
@@ -66,6 +67,7 @@ class CompanyServices:
         await self.db.execute(query=query)
 
     async def update_company(self, company_id: int, company: CompanyUpdateRequest) -> ResultCompany:
+        await self.check_company_name(company_name=company.company_name)
         query = select(Company).where(Company.company_id == company_id)
         company_db = await self.db.fetch_one(query=query)
         if not company_db:
@@ -82,3 +84,8 @@ class CompanyServices:
         updated_company = await self.get_company(company_id=company_id)
         return updated_company
 
+    async def check_company_name(self, company_name: str):
+        query = select(Company).where(Company.company_name == company_name)
+        company_check = await self.db.fetch_one(query=query)
+        if company_check:
+            raise HTTPException(status_code=400, detail='Company already exist')
