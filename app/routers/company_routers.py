@@ -11,7 +11,7 @@ company_routers = APIRouter()
 
 
 @company_routers.get("/companies", tags=["Company"], response_model=Results)
-async def get_users(db: Database = Depends(get_db), current_user: UserScheme = Depends(get_current_user)) -> Results:
+async def get_companies(db: Database = Depends(get_db), current_user: UserScheme = Depends(get_current_user)) -> Results:
     company_service = CompanyServices(db=db, current_user=current_user)
     users_list = await company_service.get_companies()
     return users_list
