@@ -79,7 +79,7 @@ class UserServices:
         query = select(User).where(User.user_email == user_email)
         user = await self.db.fetch_one(query=query)
         if user:
-            raise HTTPException(status_code=400, detail='email exist')
+            raise HTTPException(status_code=400, detail='email already exist')
 
     async def get_user_password(self, user_email: str) -> str:
         query = select(User).where(User.user_email == user_email)
