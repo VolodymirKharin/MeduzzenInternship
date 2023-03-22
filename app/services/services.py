@@ -11,15 +11,20 @@ from datetime import datetime
 
 
 class UserServices:
-    def __init__(self, db: Database):
+    def __init__(self, db: Database, current_user: UserScheme = None):
         self.db = db
+        self.current_user_id = None if not current_user else current_user.user_id
 
     async def get_users(self) -> Results:
+        if not self.current_user_id:
+            raise HTTPException(status_code=403, detail="It's not your account")
         user_list = await self.db.fetch_all(query=select(User))
         result = UserListResponse(users=[UserScheme(**item) for item in user_list])
         return Results(result=result)
 
     async def get_user(self, user_id: int) -> ResultUser:
+        if not self.current_user_id:
+            raise HTTPException(status_code=403, detail="It's not your account")
         query = select(User).where(User.user_id == user_id)
         user = await self.db.fetch_one(query=query)
         if not user:
@@ -30,21 +35,30 @@ class UserServices:
         if not (user.user_password == user.user_password_repeat):
             raise HTTPException(status_code=422, detail='Passwords do not match')
         await self.check_email(user_email=user.user_email)
+        datetime_now = datetime.now()
         new_user = {
-            "created_at": datetime.now(),
-            "updated_at": datetime.now(),
+            "created_at": datetime_now,
+            "updated_at": datetime_now,
             "user_name": user.user_name,
             "user_email": user.user_email,
             "user_password": hash.encrypt_password(password=user.user_password),
             "user_status": user.user_status,
-
         }
         query = insert(User).values(new_user)
         user_id = await self.db.execute(query=query)
-        new_user_db = await self.get_user(user_id)
-        return new_user_db
+        return ResultUser(result=UserScheme(user_id=user_id,
+                                            user_name=user.user_name,
+                                            user_email=user.user_email,
+                                            user_status=user.user_status,
+                                            created_at=datetime_now,
+                                            updated_at=datetime_now,
+
+        ))
+
 
     async def delete_user(self, user_id: int):
+        if user_id != self.current_user_id:
+            raise HTTPException(status_code=403, detail="It's not your account")
         query = delete(User).where(User.user_id == user_id)
         await self.db.execute(query=query)
 
@@ -73,6 +87,8 @@ class UserServices:
         return user.user_password
 
     async def update_user(self, user_id: int, user: UserUpdateRequest) -> ResultUser:
+        if user_id != self.current_user_id:
+            raise HTTPException(status_code=403, detail="It's not your account")
         await self.check_for_existing(user_id=user_id)
         if user.user_password is not None:
             if not (user.user_password == user.user_password_repeat):

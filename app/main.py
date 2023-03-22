@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routers.user_routers import user_routers
 from routers.auth_routers import auth_routers
+from routers.company_routers import company_routers
 import uvicorn
 import config
 from db.db_connection import connect_to_database, close_database_connection, get_redis
@@ -12,7 +13,7 @@ def get_application() -> FastAPI:
     my_app = FastAPI()
     my_app.include_router(user_routers)
     my_app.include_router(auth_routers)
-
+    my_app.include_router(company_routers)
     origins = [
         "https://0.0.0.0:8000"
     ]
