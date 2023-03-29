@@ -7,7 +7,7 @@ from schemas.schemas import ResultUser, UserScheme, SignUpRequest
 from db.db_connection import get_db
 
 from utils.token_verify import VerifyToken, decode_access_token
-from services.services import UserServices
+from services.user_services import UserServices
 
 from fastapi.security import HTTPBearer
 

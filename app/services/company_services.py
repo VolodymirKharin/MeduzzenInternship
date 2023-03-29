@@ -16,20 +16,15 @@ class CompanyServices:
         self.current_user_id = None if not current_user else current_user.user_id
 
     async def get_companies(self) -> Results:
-        if not self.current_user_id:
-            raise HTTPException(status_code=403, detail="You are not authorized")
+        await self.check_current_user()
         company_list = await self.db.fetch_all(query=select(Company))
         result = CompanyListResponse(companies=[CompanyScheme(**item) for item in company_list])
         return Results(result=result)
 
     async def get_company(self, company_id: int) -> ResultCompany:
-        if not self.current_user_id:
-            raise HTTPException(status_code=403, detail="You are not authorized")
-        query = select(Company).where(Company.company_id == company_id)
-        company = await self.db.fetch_one(query=query)
-        if not company:
-            raise HTTPException(status_code=404, detail='Company does not exist')
-        return ResultCompany(result=CompanyScheme(**dict(company)))
+        await self.check_current_user()
+        company = await self.check_for_company_existing(company_id=company_id)
+        return ResultCompany(result=company)
 
     async def create_company(self, company: SignUpCompany) -> ResultCompany:
         await self.check_company_name(company_name=company.company_name)
@@ -54,17 +49,26 @@ class CompanyServices:
         )
         )
 
-
     async def delete_company(self, company_id: int):
+        await self.check_company_for_exist(company_id=company_id)
+        await self.check_for_owner(company_id=company_id)
+        query = delete(Company).where(Company.company_id == company_id)
+        await self.db.execute(query=query)
+
+    async def check_company_for_exist(self, company_id: int):
         query = select(Company).where(Company.company_id == company_id)
         company_db = await self.db.fetch_one(query=query)
         if not company_db:
             raise HTTPException(status_code=404, detail=f"Company id:{company_id} does not exist")
+
+    async def check_for_owner(self, company_id: int):
+        query = select(Company).where(Company.company_id == company_id)
+        company_db = await self.db.fetch_one(query=query)
+        if not company_db:
+            raise HTTPException(status_code=404, detail="Company does not exist")
         check_company = CompanyScheme(**dict(company_db))
         if check_company.owner_id != self.current_user_id:
             raise HTTPException(status_code=403, detail="You are not owner in this company")
-        query = delete(Company).where(Company.company_id == company_id)
-        await self.db.execute(query=query)
 
     async def update_company(self, company_id: int, company: CompanyUpdateRequest) -> ResultCompany:
         await self.check_company_name(company_name=company.company_name)
@@ -89,3 +93,15 @@ class CompanyServices:
         company_check = await self.db.fetch_one(query=query)
         if company_check:
             raise HTTPException(status_code=400, detail='Company already exist')
+
+    async def check_current_user(self):
+        if not self.current_user_id:
+            raise HTTPException(status_code=403, detail="You are not authorized")
+
+    async def check_for_company_existing(self, company_id: int) -> CompanyScheme:
+        query = select(Company).where(Company.company_id == company_id)
+        company = await self.db.fetch_one(query=query)
+        if not company:
+            raise HTTPException(status_code=404, detail='Company does not exist')
+        return CompanyScheme(**dict(company))
+
