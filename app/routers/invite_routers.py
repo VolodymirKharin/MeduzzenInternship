@@ -47,7 +47,7 @@ async def get_user_invites(current_user: UserScheme = Depends(get_current_user),
                       db: Database = Depends(get_db)) -> AllUserInvites:
     action_service = InviteServices(db=db, current_user=current_user)
     my_invites = await action_service.get_my_invites()
-    return my_invites
+    return AllUserInvites(result=my_invites.result)
 
 
 @invite_routers.get("/invite/company/{company_id}", response_model=AllUserInvites, status_code=status.HTTP_200_OK)
@@ -58,7 +58,7 @@ async def get_company_invites(company_id: int, current_user: UserScheme = Depend
 
     action_service = InviteServices(db=db, current_user=current_user)
     company_invites = await action_service.get_company_invites(company_id=company_id)
-    return company_invites
+    return AllUserInvites(result=company_invites.result)
 
 
 @invite_routers.delete('/invite/{invite_id}')

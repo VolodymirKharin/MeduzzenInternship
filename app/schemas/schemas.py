@@ -24,10 +24,10 @@ class UserSchemeToken(BaseModel):
 
     class Config:
         orm_mode = True
+
 class SignInRequest(BaseModel):
     user_email: EmailStr
     user_password: str = Field(..., min_length=4, max_length=20)
-
 
     class Config:
         orm_mode = True

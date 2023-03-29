@@ -6,7 +6,6 @@ from schemas.schemas import UserScheme
 from schemas.company_schemas import ResultCompany, CompanyScheme, SignUpCompany, Results, CompanyListResponse, CompanyUpdateRequest
 from databases import Database
 
-from services.user_services import UserServices
 
 from datetime import datetime
 

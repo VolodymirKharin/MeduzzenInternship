@@ -41,7 +41,7 @@ async def get_user_request(current_user: UserScheme = Depends(get_current_user),
                       db: Database = Depends(get_db)) -> AllUserRequest:
     request_service = RequestServices(db=db, current_user=current_user)
     my_invites = await request_service.get_my_request()
-    return my_invites
+    return AllUserRequest(result=my_invites.result)
 
 
 @request_routers.get("/request/company/{company_id}", response_model=ResponseRequest)

@@ -1,7 +1,7 @@
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean, func
 from sqlalchemy.orm import relationship
-from sqlalchemy import MetaData, Table
+from sqlalchemy import Table
 
 Base = declarative_base()
 
@@ -24,25 +24,6 @@ member = Table(
     Column("user_role", String, default='user')
 )
 
-
-# class Action(Base):
-#     __tablename__ = "action_table"
-#
-#     action_id = Column("invitation_id", Integer, autoincrement=True, primary_key=True)
-#     user_id = Column("user_id", Integer, ForeignKey("user_table.user_id", ondelete="CASCADE"), nullable=False)
-#     company_id = Column("company", Integer, ForeignKey("company_table.company_id", ondelete="CASCADE"))
-#     action_type = Column(String, nullable=False)
-#
-#
-# class Member(Base):
-#     __tablename__ = "member_table"
-#
-#     member_id = Column("member_id", Integer, autoincrement=True, primary_key=True)
-#     user_id = Column("user_id", Integer, ForeignKey("user_table.user_id", ondelete="CASCADE"), nullable=False)
-#     company_id = Column("company_id", Integer, ForeignKey("company_table.company_id", ondelete="CASCADE"))
-#     user_role = Column("user_role", String, default='user')
-#
-#     invited_users = relationship("User", secondary=user_invitations, backref="invited_user", cascade="all, delete")
 
 class User(Base):
     __tablename__ = "user_table"
@@ -69,7 +50,6 @@ class Company(Base):
     owner_id = Column("owner_id", Integer, ForeignKey("user_table.user_id", ondelete="CASCADE"), nullable=False)
 
     user = relationship("User", secondary=action, back_populates="company")
-#    invitations = relationship("Invitation", backref='invitation', cascade="all, delete")
-#    users_involved = relationship("User", secondary=user_companies, backref="uesrs_involved", cascade="all, delete")
+
 
 

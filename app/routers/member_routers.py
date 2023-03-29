@@ -21,7 +21,7 @@ async def get_company_members(company_id: int, db: Database = Depends(get_db),
     await company_service.check_for_owner(company_id=company_id)
     member_service = MemberServices(db=db)
     members_list = await member_service.get_company_members()
-    return members_list
+    return AllMembers(result=members_list.result)
 
 
 @member_routers.delete('/company/{company_id}/member/{member_id}')

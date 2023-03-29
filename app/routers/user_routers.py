@@ -18,7 +18,7 @@ def home():
 async def get_users(db: Database = Depends(get_db), current_user: UserScheme = Depends(get_current_user)) -> Results:
     user_service = UserServices(db=db, current_user=current_user)
     users_list = await user_service.get_users()
-    return users_list
+    return Results(result=users_list.result)
 
 
 @user_routers.get("/user/{user_id}", response_model=ResultUser)
@@ -27,7 +27,7 @@ async def get_user(user_id: int, db: Database = Depends(get_db), current_user: U
     user_db = await user_service.get_user(user_id=user_id)
     if not user_db:
         raise HTTPException(status_code=404, detail='User does not exist')
-    return user_db
+    return ResultUser(result=user_db.result)
 
 
 @user_routers.post("/user", response_model=ResultUser, status_code=status.HTTP_201_CREATED)
@@ -36,7 +36,7 @@ async def create_user(user: SignUpRequest, db: Database = Depends(get_db)) -> Re
     new_user = await user_service.create_user(user=user)
     if not new_user:
         raise HTTPException(status_code=422, detail='User already exist')
-    return new_user
+    return ResultUser(result=new_user.result)
 
 
 @user_routers.put("/user/{user_id}", response_model=ResultUser, status_code=status.HTTP_200_OK)
@@ -45,7 +45,7 @@ async def update_user(user_id: int, user: UserUpdateRequest, current_user: UserS
     updated_user = await user_service.update_user(user_id=user_id, user=user)
     if not updated_user:
         raise HTTPException(status_code=404, detail='User does not exist')
-    return updated_user
+    return ResultUser(result=updated_user.result)
 
 
 @user_routers.delete("/user/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
