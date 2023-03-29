@@ -15,6 +15,7 @@ class UserScheme(BaseModel):
     class Config:
         orm_mode = True
 
+
 class UserSchemeToken(BaseModel):
     user_id: int
     user_name: str
