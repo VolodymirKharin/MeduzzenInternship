@@ -6,7 +6,7 @@ from models.models import action, member
 
 
 from schemas.action_schemas import SendInviteRequest, AllUserInvites, Member, GetInviteRequest
-from schemas.schemas import UserScheme
+from schemas.user_schemas import UserScheme
 
 
 class InviteServices:

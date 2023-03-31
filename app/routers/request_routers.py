@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from starlette import status
 
 from schemas.action_schemas import Response, Member, GetInviteRequest, ResponseRequest, SendRequest, AllUserRequest, ResponseMember
-from schemas.schemas import UserScheme
+from schemas.user_schemas import UserScheme
 
 from services.invite_services import InviteServices
 from services.request_services import RequestServices
@@ -20,7 +20,7 @@ request_routers = APIRouter(tags=["request"])
 async def send_request(request: SendRequest, current_user: UserScheme = Depends(get_current_user),
                       db: Database = Depends(get_db)) -> Response[GetInviteRequest]:
     company_service = CompanyServices(db=db, current_user=current_user)
-    await company_service.check_for_company_existing(company_id=request.company_id)
+    await company_service.check_company_for_exist(company_id=request.company_id)
 
     request_service = RequestServices(db=db, current_user=current_user)
 

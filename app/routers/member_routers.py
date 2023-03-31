@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from starlette import status
 
 from schemas.action_schemas import Response, AllMembers
-from schemas.schemas import UserScheme
+from schemas.user_schemas import UserScheme
 from services.member_services import MemberServices
 from services.auth_services import get_current_user
 from services.company_services import CompanyServices
@@ -11,7 +11,7 @@ from db.db_connection import get_db
 from databases import Database
 
 
-member_routers = APIRouter(tags=["actions"])
+member_routers = APIRouter(tags=["members"])
 
 
 @member_routers.get('/company/{company_id}/members', response_model=AllMembers, status_code=status.HTTP_200_OK)

@@ -5,7 +5,7 @@ from starlette import status
 from models.models import member
 
 from schemas.action_schemas import Member, AllMembers, MemberListResponse
-from schemas.schemas import UserScheme
+from schemas.user_schemas import UserScheme
 
 
 class MemberServices:

@@ -3,7 +3,7 @@ import random
 from databases import Database
 
 from fastapi import Depends, HTTPException
-from schemas.schemas import ResultUser, UserScheme, SignUpRequest
+from schemas.user_schemas import ResultUser, UserScheme, SignUpRequest
 from db.db_connection import get_db
 
 from utils.token_verify import VerifyToken, decode_access_token

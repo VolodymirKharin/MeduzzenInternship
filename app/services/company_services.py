@@ -2,7 +2,7 @@ from fastapi import HTTPException
 
 from sqlalchemy.sql import select, insert, update, delete
 from models.models import Company
-from schemas.schemas import UserScheme
+from schemas.user_schemas import UserScheme
 from schemas.company_schemas import ResultCompany, CompanyScheme, SignUpCompany, Results, CompanyListResponse, CompanyUpdateRequest
 from databases import Database
 
@@ -23,7 +23,7 @@ class CompanyServices:
 
     async def get_company(self, company_id: int) -> ResultCompany:
         await self.check_current_user()
-        company = await self.check_for_company_existing(company_id=company_id)
+        company = await self.check_company_for_exist(company_id=company_id)
         return ResultCompany(result=company)
 
     async def create_company(self, company: SignUpCompany) -> ResultCompany:
@@ -59,8 +59,8 @@ class CompanyServices:
         query = select(Company).where(Company.company_id == company_id)
         company_db = await self.db.fetch_one(query=query)
         if not company_db:
-            raise HTTPException(status_code=404, detail=f"Company id:{company_id} does not exist")
-
+            raise HTTPException(status_code=404, detail=f"Company does not exist")
+        return CompanyScheme(**dict(company_db))
     async def check_for_owner(self, company_id: int):
         query = select(Company).where(Company.company_id == company_id)
         company_db = await self.db.fetch_one(query=query)
@@ -69,6 +69,8 @@ class CompanyServices:
         check_company = CompanyScheme(**dict(company_db))
         if check_company.owner_id != self.current_user_id:
             raise HTTPException(status_code=403, detail="You are not owner in this company")
+
+
 
     async def update_company(self, company_id: int, company: CompanyUpdateRequest) -> ResultCompany:
         await self.check_company_name(company_name=company.company_name)
@@ -98,10 +100,4 @@ class CompanyServices:
         if not self.current_user_id:
             raise HTTPException(status_code=403, detail="You are not authorized")
 
-    async def check_for_company_existing(self, company_id: int) -> CompanyScheme:
-        query = select(Company).where(Company.company_id == company_id)
-        company = await self.db.fetch_one(query=query)
-        if not company:
-            raise HTTPException(status_code=404, detail='Company does not exist')
-        return CompanyScheme(**dict(company))
 

@@ -6,6 +6,7 @@ from routers.invite_routers import invite_routers
 from routers.request_routers import request_routers
 from routers.company_routers import company_routers
 from routers.member_routers import member_routers
+from routers.admin_routers import admin_routers
 
 import uvicorn
 import config
@@ -21,6 +22,7 @@ def get_application() -> FastAPI:
     my_app.include_router(invite_routers)
     my_app.include_router(request_routers)
     my_app.include_router(member_routers)
+    my_app.include_router(admin_routers)
 
 
     origins = [
