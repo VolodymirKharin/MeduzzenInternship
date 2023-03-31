@@ -1,13 +1,13 @@
 from fastapi import APIRouter, HTTPException, Depends
 from starlette import status
-from schemas.schemas import UserScheme
+from schemas.user_schemas import UserScheme
 from schemas.company_schemas import SignUpCompany, CompanyUpdateRequest, ResultCompany, Results
 from services.company_services import CompanyServices
 from db.db_connection import get_db
 from databases import Database
 from services.auth_services import get_current_user
 
-company_routers = APIRouter(tags=["Company"])
+company_routers = APIRouter(tags=["company"])
 
 
 @company_routers.get("/companies", response_model=Results)

@@ -2,7 +2,7 @@ from starlette import status
 
 
 from fastapi import APIRouter, HTTPException, Depends
-from schemas.schemas import SignInRequest, TokenResponse, Token, UserSchemeToken, ResultUserToken
+from schemas.user_schemas import SignInRequest, TokenResponse, Token, UserSchemeToken, ResultUserToken
 from services.auth_services import get_current_user
 from services.user_services import UserServices
 from utils.security import Hasher

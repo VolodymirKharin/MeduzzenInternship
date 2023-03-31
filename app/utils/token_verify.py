@@ -3,7 +3,7 @@ import jwt
 
 from fastapi import HTTPException
 from config import DOMAIN, API_AUDIENCE, ISSUER, ALGORITHMS, ACCES_TOKEN_EXPIRE_MINUTES, JWT_SECRET_KEY, ALGORITHM
-from schemas.schemas import TokenResponse
+from schemas.user_schemas import TokenResponse
 
 from datetime import datetime, timedelta
 

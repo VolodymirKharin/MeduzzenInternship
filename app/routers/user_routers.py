@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from starlette import status
 
-from schemas.schemas import UserUpdateRequest, SignUpRequest, Results, ResultUser, UserScheme
+from schemas.user_schemas import UserUpdateRequest, SignUpRequest, Results, ResultUser, UserScheme
 from services.user_services import UserServices
 from db.db_connection import get_db
 from databases import Database

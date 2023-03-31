@@ -2,7 +2,7 @@ from fastapi import HTTPException
 
 from sqlalchemy.sql import select, insert, update, delete
 from models.models import User
-from schemas.schemas import UserScheme, UserListResponse, UserUpdateRequest, SignUpRequest, Results, ResultUser
+from schemas.user_schemas import UserScheme, UserListResponse, UserUpdateRequest, SignUpRequest, Results, ResultUser
 from databases import Database
 
 

@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from starlette import status
 
 from schemas.action_schemas import SendInviteRequest, Response, AllUserInvites, Member, AllMembers, GetInviteRequest,ResponseMember, SendRequest
-from schemas.schemas import UserScheme
+from schemas.user_schemas import UserScheme
 
 from services.invite_services import InviteServices
 from services.member_services import MemberServices
@@ -14,7 +14,7 @@ from db.db_connection import get_db
 from databases import Database
 
 
-invite_routers = APIRouter(tags=["actions"])
+invite_routers = APIRouter(tags=["invite"])
 
 
 @invite_routers.post("/invite", response_model=Response[GetInviteRequest], status_code=status.HTTP_201_CREATED)
@@ -24,7 +24,7 @@ async def send_invite(invite: SendInviteRequest, current_user: UserScheme = Depe
     await user_service.check_for_user_existing(user_id=invite.user_id)
 
     company_service = CompanyServices(db=db, current_user=current_user)
-    await company_service.check_for_company_existing(company_id=invite.company_id)
+    await company_service.check_company_for_exist(company_id=invite.company_id)
 
     action_service = InviteServices(db=db)
     await company_service.check_for_owner(company_id=invite.company_id)

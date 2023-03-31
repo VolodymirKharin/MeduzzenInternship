@@ -7,7 +7,7 @@ from models.models import action, member, Company
 
 from schemas.action_schemas import SendRequest, AllUserRequest, SendInviteRequest, Member, ResponseRequest, GetInviteRequest
 from schemas.company_schemas import CompanyScheme
-from schemas.schemas import UserScheme
+from schemas.user_schemas import UserScheme
 
 
 class RequestServices:
